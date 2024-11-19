@@ -351,50 +351,31 @@ function Notebook:_get_lines(cells)
         end
         cell.source = clean_source
 
-        -- local unescaped_lines = {} -- store a table of strings
-        -- local lines = {}           -- split on \n to make each line explicit
-        -- local code_str = ""
-        -- for _, cell in ipairs(cells) do
-        --     -- Clean source content - ensure it's valid UTF-8
-        --     local clean_source = {}
-        --     for _, line in ipairs(cell.source) do
-        --         if type(line) == "string" then
-        --             -- Remove any invalid UTF-8 sequences
-        --             local cleaned = line:gsub("[\192-\255][\128-\191]*", "")
-        --             table.insert(clean_source, cleaned)
-        --         end
-        --     end
-        --     cell.source = clean_source
-        --
         if cell.cell_type == "markdown" then
-            while cell.source[1] == '"""\n' do
-                table.remove(cell.source, 1)
-            end
-
-            -- Remove from end
-            while cell.source[#cell.source] == '"""' do
-                table.remove(cell.source)
-            end
-            local markdown_str = string.format('%s"""\n%s\n"""', string.format(CELL_HEADER, cell.id, "MARKDOWN"),
+            -- Process markdown cells
+            local markdown_str = string.format('%s"""\n%s\n"""',
+                string.format(CELL_HEADER, cell.id, "MARKDOWN"),
                 table.concat(cell.source, ""))
-            unescaped_lines[#unescaped_lines + 1] = markdown_str
-        end
-        if cell.cell_type == "code" then
-            if cell.execution_count ~= nil then
-                code_str = string.format("%s%s", string.format(CELL_HEADER, cell.id, cell.execution_count),
-                    table.concat(cell.source, ""))
-                -- Don't use nvim_replace_termcodes for code cells to avoid encoding issues
-                unescaped_lines[#unescaped_lines + 1] = code_str
-            else
-                code_str = string.format("%s%s", string.format(CELL_HEADER, cell.id, " "),
-                    table.concat(cell.source, ""))
-                -- Don't use nvim_replace_termcodes for code cells to avoid encoding issues
-                unescaped_lines[#unescaped_lines + 1] = code_str
-            end
+            table.insert(unescaped_lines, markdown_str)
+        elseif cell.cell_type == "code" then
+            -- Process code cells
+            local exec_count = cell.execution_count or " "
+            local code_str = string.format("%s%s",
+                string.format(CELL_HEADER, cell.id, exec_count),
+                table.concat(cell.source, ""))
+            table.insert(unescaped_lines, code_str)
+        else
+            -- Handle or skip other cell types like 'raw'
+            -- You can decide to process them differently or skip
+            vim.notify("Skipping unhandled cell type: " .. tostring(cell.cell_type), vim.log.levels.WARN)
         end
     end
-    -- Add new line character to end of last line so it matches
-    unescaped_lines[#unescaped_lines] = unescaped_lines[#unescaped_lines] .. "\n"
+
+    -- Safely concatenate to the last element if it exists
+    if #unescaped_lines > 0 then
+        unescaped_lines[#unescaped_lines] = unescaped_lines[#unescaped_lines] .. "\n"
+    end
+
     local result_str = table.concat(unescaped_lines, "\n\n")
     for s in result_str:gmatch("(.-)\n") do
         table.insert(lines, s)
