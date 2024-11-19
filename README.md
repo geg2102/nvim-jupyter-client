@@ -60,6 +60,21 @@ require('nvim-jupyter-client').setup({
 
 ## Commands
 
+Example configuration with specific keybindings:
+
+```lua
+-- Add cells
+vim.keymap.set("n", "<leader>ja", "<cmd>JupyterAddCellBelow<CR>", { desc = "Add Jupyter cell below" })
+vim.keymap.set("n", "<leader>jA", "<cmd>JupyterAddCellAbove<CR>", { desc = "Add Jupyter cell above" })
+
+-- Cell operations
+vim.keymap.set("n", "<leader>jd", "<cmd>JupyterRemoveCell<CR>", { desc = "Remove current Jupyter cell" })
+vim.keymap.set("n", "<leader>jm", "<cmd>JupyterMergeCellAbove<CR>", { desc = "Merge with cell above" })
+vim.keymap.set("n", "<leader>jM", "<cmd>JupyterMergeCellBelow<CR>", { desc = "Merge with cell below" })
+vim.keymap.set("n", "<leader>jt", "<cmd>JupyterConvertCellType<CR>", { desc = "Convert cell type (code/markdown)" })
+```
+
+
 - `:JupyterAddCellBelow` - Add a new cell below the current cell
 - `:JupyterAddCellAbove` - Add a new cell above the current cell
 - `:JupyterRemoveCell` - Remove the current cell
