@@ -1,7 +1,17 @@
 # nvim-jupyter-client
 [![asciicast](https://asciinema.org/a/x9usnBgPpL8AcmgaG3vOk5qrG.svg)](https://asciinema.org/a/x9usnBgPpL8AcmgaG3vOk5qrG)
 
-A Neovim plugin for editing Jupyter notebooks in Neovim, providing a seamless integration between `.ipynb` files and Neovim's editing capabilities.
+A Neovim plugin for editing Jupyter notebooks in Neovim, providing a seamless
+integration between `.ipynb` files and Neovim's editing capabilities.
+If you're familiar with Jupytext, this plugin offers similar functionality but
+operates directly on the JSON structure of the notebook files. It just renders
+the files to *look* like `python` files and it gives you all your usual setup
+(e.g. treesitter, language server etc.).
+
+## ⚠️ Important Notice
+This plugin is still in the early stages of development. Please be aware that
+there might be breaking changes in future updates. And not everything is
+guaranteed to work as expected, so backup your files before testing! 
 
 ## Features
 
