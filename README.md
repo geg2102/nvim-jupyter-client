@@ -1,4 +1,5 @@
 # nvim-jupyter-client
+[![asciicast](https://asciinema.org/a/x9usnBgPpL8AcmgaG3vOk5qrG.svg)](https://asciinema.org/a/x9usnBgPpL8AcmgaG3vOk5qrG)
 
 A Neovim plugin for editing Jupyter notebooks in Neovim, providing a seamless integration between `.ipynb` files and Neovim's editing capabilities.
 
