@@ -8,6 +8,7 @@ local M = {}
 local CELL_HEADER = "# %%%% %s [%s]\n"
 local ID_PATTERN = "^#%s%%%%%s(.-)%s%[.-%]"
 local EXECUTION_PATTERN = "^#%s%%%%%s.-%s(%[.-%])"
+local CELL_TYPE_PATTERN = "^#%s*%%%%%s*.-%s*%[(.-)%]"
 
 function M.find_cell_by_id(cells, cell_id)
     for _, cell in ipairs(cells) do
@@ -81,15 +82,31 @@ function M.update_cells_from_buffer(notebook, bufnr)
     while i <= num_lines do
         local line = lines[i]
         local trimmed_line = line:gsub("^%s*(.-)%s*$", "%1")
+
         if string.match(trimmed_line, "^#%s*%%%%") then
             local cell_id = string.match(trimmed_line, ID_PATTERN)
             if not cell_id then
                 cell_id = utils.uuid()
                 local new_header = string.format(CELL_HEADER, cell_id, " ")
                 api.nvim_buf_set_lines(bufnr, i - 1, i, false, { new_header })
+                -- Update lines and line variables after modifying the buffer
                 lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
                 num_lines = #lines
                 line = new_header
+                trimmed_line = line:gsub("^%s*(.-)%s*$", "%1")
+            end
+
+            -- Extract cell type from header
+            local cell_type_in_header = string.match(trimmed_line, CELL_TYPE_PATTERN)
+            if cell_type_in_header then
+                cell_type_in_header = string.lower(cell_type_in_header)
+                if cell_type_in_header == "markdown" then
+                    cell_type_in_header = "markdown"
+                else
+                    cell_type_in_header = "code"
+                end
+            else
+                cell_type_in_header = "code"
             end
 
             local cell_lines = {}
@@ -104,6 +121,7 @@ function M.update_cells_from_buffer(notebook, bufnr)
                 end
             end
 
+            -- Remove trailing empty lines
             while #cell_lines > 0 and cell_lines[#cell_lines]:match("^%s*$") do
                 table.remove(cell_lines)
             end
@@ -114,16 +132,14 @@ function M.update_cells_from_buffer(notebook, bufnr)
             local existing_cell = M.find_cell_by_id(notebook.cells, cell_id)
             if existing_cell then
                 existing_cell.source = cell_lines
+                existing_cell.cell_type = cell_type_in_header -- Update cell_type here
+                setmetatable(existing_cell, Cell)
                 table.insert(temp_cells, existing_cell)
             else
                 local newCell = Cell:new()
                 newCell.id = cell_id
                 newCell.source = cell_lines
-                if string.find(line, "MARKDOWN") then
-                    newCell.cell_type = "markdown"
-                else
-                    newCell.cell_type = "code"
-                end
+                newCell.cell_type = cell_type_in_header
                 table.insert(temp_cells, newCell)
             end
         else
