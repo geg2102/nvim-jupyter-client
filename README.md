@@ -129,6 +129,5 @@ vim.keymap.set("n", "<leader>jt", "<cmd>JupyterConvertCellType<CR>", { desc = "C
 ## Acknowledgements
 - This pluging heavily leverages [dkjson](https://github.com/LuaDist/dkjson) Lua JSON library (packaged with plugin)
 
-## License
-
-MIT License
+## Roadmap
+- [ ] Direct kernel interaction using ZeroMQ (either rust or pure lua implementation)
