@@ -7,8 +7,6 @@ local file_ops = require("nvim-jupyter-client.objects.notebook.file_operations")
 local buffer_ops = require("nvim-jupyter-client.objects.notebook.buffer_operations")
 local navigation = require("nvim-jupyter-client.objects.notebook.navigation")
 
-local decor_ns = api.nvim_create_namespace('rendered_jupyter')
-api.nvim_set_hl(decor_ns, 'jupyterhl', { ctermfg = 'red', ctermbg = 'yellow', cterm = { bold = true } })
 
 local Notebook = {}
 

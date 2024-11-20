@@ -3,7 +3,6 @@ local api = vim.api
 local buffer_ops = require("nvim-jupyter-client.objects.notebook.buffer_operations")
 
 local CELL_HEADER = "# %%%% %s [%s]\n"
-local decor_ns = api.nvim_create_namespace('rendered_jupyter')
 
 function M.render_py(self, bufnr)
     if bufnr == nil then

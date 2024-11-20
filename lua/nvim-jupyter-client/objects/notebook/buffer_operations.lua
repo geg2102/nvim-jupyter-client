@@ -9,9 +9,6 @@ local CELL_HEADER = "# %%%% %s [%s]\n"
 local ID_PATTERN = "^#%s%%%%%s(.-)%s%[.-%]"
 local EXECUTION_PATTERN = "^#%s%%%%%s.-%s(%[.-%])"
 
-local decor_ns = api.nvim_create_namespace('rendered_jupyter')
-api.nvim_set_hl(decor_ns, 'jupyterhl', { ctermfg = 'red', ctermbg = 'yellow', cterm = { bold = true } })
-
 function M.find_cell_by_id(cells, cell_id)
     for _, cell in ipairs(cells) do
         if cell.id == cell_id then
@@ -139,6 +136,11 @@ function M.update_cells_from_buffer(notebook, bufnr)
 end
 
 function M.reset_extmarks(bufnr)
+    local jupyter_client = require("nvim-jupyter-client")
+    local decor_ns = jupyter_client.decor_ns
+    local config = jupyter_client.config or {}
+    local highlight_group = config.cell_highlight_group or "CurSearch"
+
     local buf = bufnr or 0
     api.nvim_buf_clear_namespace(buf, decor_ns, 0, -1)
     local lines = api.nvim_buf_get_lines(0, 0, -1, false)
@@ -148,7 +150,7 @@ function M.reset_extmarks(bufnr)
             api.nvim_buf_set_extmark(0, decor_ns, index - 1, 0,
                 {
                     id = index,
-                    virt_text = { { "In: " .. execution_pattern .. string.rep(" ", 10000), "CurSearch" } },
+                    virt_text = { { "In: " .. execution_pattern .. string.rep(" ", 10000), highlight_group } },
                     virt_text_pos = "overlay",
                     virt_text_win_col = 0
                 })

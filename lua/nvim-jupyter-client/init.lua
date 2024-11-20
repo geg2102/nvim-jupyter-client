@@ -8,7 +8,19 @@ M.config = {
     template = nil,
     get_template = function()
         return require("nvim-jupyter-client.template")
-    end
+    end,
+    cell_highlight_group = "CurSearch", -- Default highlight group for cell execution count
+    highlights = {
+        cell_title = {
+            ctermfg = 'red',
+            ctermbg = 'yellow',
+            cterm = { bold = true },
+            -- Add GUI colors for modern terminals
+            fg = '#ff0000',
+            bg = '#ffff00',
+            bold = true,
+        }
+    }
 }
 
 -- Get notebook instance for current buffer
@@ -105,5 +117,9 @@ function M.setup(user_config)
         end
     })
 end
+
+M.decor_ns = api.nvim_create_namespace('rendered_jupyter')
+api.nvim_set_hl(M.decor_ns, 'jupyterhl', M.config.highlights.cell_title)
+
 
 return M
