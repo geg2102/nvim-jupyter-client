@@ -42,7 +42,7 @@ Basic setup with default configuration:
 require('nvim-jupyter-client').setup({})
 ```
 
-Custom configuration with template:
+User configurable options:
 
 ```lua
 require('nvim-jupyter-client').setup({
@@ -65,6 +65,15 @@ require('nvim-jupyter-client').setup({
         },
         nbformat = 4,
         nbformat_minor = 5
+    }
+    cell_highlight_group = "CurSearch", --whatever you want here
+    -- If custom highlight group then set these manually
+    highlights = {
+        cell_title = {
+            ctermfg = "#ffffff",
+            ctermbg = "#000000",
+            bold = true
+        }
     }
 })
 ```
