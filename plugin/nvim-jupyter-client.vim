@@ -9,5 +9,4 @@ command! -nargs=0 JupyterRemoveCell lua require('nvim-jupyter-client').get_noteb
 command! -nargs=0 JupyterMergeCellAbove lua require('nvim-jupyter-client').get_notebook():merge_above()
 command! -nargs=0 JupyterMergeCellBelow lua require('nvim-jupyter-client').get_notebook():merge_below()
 command! -nargs=0 JupyterConvertCellType lua require('nvim-jupyter-client').get_notebook():convert_type()
-command! -nargs=0 JupyterNew lua require('nvim-jupyter-client').new_notebook()
 
