@@ -2,6 +2,7 @@ local M = {}
 local Cell = require("nvim-jupyter-client.objects.cell")
 local buffer_ops = require("nvim-jupyter-client.objects.notebook.buffer_operations")
 local navigation = require("nvim-jupyter-client.objects.notebook.navigation")
+local utils = require("nvim-jupyter-client.utils.utils")
 
 function M.find_cell_by_id(cells, cell_id)
     for _, cell in ipairs(cells) do
@@ -68,7 +69,18 @@ function M.convert_type(notebook)
     buffer_ops.update_cells_from_buffer(notebook, 0)
     local cursor_id = navigation.get_under_cursor_cell_id(0)
     local cell = M.find_cell_by_id(notebook.cells, cursor_id)
+    if not cell then
+        vim.notify("No cell found under cursor", vim.log.levels.ERROR)
+        return
+    end
+
+    -- Remove triple quotes if converting from markdown to code
+    if cell.cell_type == "markdown" then
+        cell.source = utils.remove_triple_quotes(cell.source)
+    end
+
     cell.cell_type = cell.cell_type == "code" and "markdown" or "code"
+
     notebook:render_py(0)
 end
 

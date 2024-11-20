@@ -4,7 +4,7 @@ local buffer_ops = require("nvim-jupyter-client.objects.notebook.buffer_operatio
 
 local CELL_HEADER = "# %%%% %s [%s]\n"
 
-function M.render_py(self, bufnr)
+function M.render_py(notebook, bufnr)
     if bufnr == nil then
         vim.cmd('tabnew')
     end
@@ -15,21 +15,22 @@ function M.render_py(self, bufnr)
     vim.bo[buf].filetype = "python"
     vim.bo[buf].autoread = false
 
-    local lines = M._get_lines(self.cells)
+    local lines = M._get_lines(notebook.cells)
     api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     buffer_ops.reset_extmarks(0)
     vim.wo.foldenable = false
     vim.bo[buf].modified = false
+    buffer_ops.update_cells_from_buffer(notebook, buf)
 end
 
-function M.render_ipynb(self, bufnr)
+function M.render_ipynb(notebook, bufnr)
     local buf = bufnr or api.nvim_get_current_buf()
-    self:_update_cells_from_buffer(0)
+    notebook:_update_cells_from_buffer(0)
     local output_data = {
-        cells = self.cells,
-        metadata = self.metadata,
-        nbformat = self.nbformat,
-        nbformat_minor = self.nbformat_minor
+        cells = notebook.cells,
+        metadata = notebook.metadata,
+        nbformat = notebook.nbformat,
+        nbformat_minor = notebook.nbformat_minor
     }
 
     for _, cell in ipairs(output_data.cells) do
@@ -50,19 +51,22 @@ function M.render_ipynb(self, bufnr)
 end
 
 function M._get_lines(cells)
-    local unescaped_lines = {}
-    local lines = {}
+    local unescaped_lines = {} -- store a table of strings
+    local lines = {}           -- split on \n to make each line explicit
 
     for _, cell in ipairs(cells) do
+        -- Ensure cell.source is a table
         if type(cell.source) == "string" then
             cell.source = { cell.source }
         elseif type(cell.source) ~= "table" then
             cell.source = { "" }
         end
 
+        -- Clean source content - ensure it's valid UTF-8
         local clean_source = {}
         for _, line in ipairs(cell.source) do
             if type(line) == "string" then
+                -- Remove any invalid UTF-8 sequences
                 local cleaned = line:gsub("[\192-\255][\128-\191]*", "")
                 table.insert(clean_source, cleaned)
             end
@@ -70,11 +74,21 @@ function M._get_lines(cells)
         cell.source = clean_source
 
         if cell.cell_type == "markdown" then
-            local markdown_str = string.format('%s"""\n%s\n"""',
+            -- Process markdown cells
+            local source_content = table.concat(cell.source, "")
+            -- Check if content is already wrapped in """
+            local content_str
+            if source_content:match('^""".*"""$') then
+                content_str = source_content
+            else
+                content_str = string.format('"""\n%s\n"""', source_content)
+            end
+            local markdown_str = string.format('%s%s',
                 string.format(CELL_HEADER, cell.id, "MARKDOWN"),
-                table.concat(cell.source, ""))
+                content_str)
             table.insert(unescaped_lines, markdown_str)
         elseif cell.cell_type == "code" then
+            -- Process code cells
             local exec_count = cell.execution_count or " "
             local code_str = string.format("%s%s",
                 string.format(CELL_HEADER, cell.id, exec_count),

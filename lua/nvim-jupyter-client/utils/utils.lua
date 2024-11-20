@@ -23,12 +23,41 @@ function M.pair_with_next(t)
 end
 
 function M.uuid()
-    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1,9)))
+    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
     local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-    return string.gsub(template, '[xy]', function (c)
+    return string.gsub(template, '[xy]', function(c)
         local v = (c == "x") and random(0, 0xf) or random(8, 0xb)
         return string.format('%x', v)
     end)
+end
+
+function M.remove_triple_quotes(source_lines)
+    -- Remove leading and trailing empty lines
+    while #source_lines > 0 and source_lines[1]:match("^%s*$") do
+        table.remove(source_lines, 1)
+    end
+    while #source_lines > 0 and source_lines[#source_lines]:match("^%s*$") do
+        table.remove(source_lines, #source_lines)
+    end
+
+    -- Remove leading triple quotes
+    if #source_lines > 0 and source_lines[1]:match('^%s*"""%s*$') then
+        table.remove(source_lines, 1)
+    end
+    -- Remove trailing triple quotes
+    if #source_lines > 0 and source_lines[#source_lines]:match('^%s*"""%s*$') then
+        table.remove(source_lines, #source_lines)
+    end
+
+    -- Remove any leading or trailing empty lines again
+    while #source_lines > 0 and source_lines[1]:match("^%s*$") do
+        table.remove(source_lines, 1)
+    end
+    while #source_lines > 0 and source_lines[#source_lines]:match("^%s*$") do
+        table.remove(source_lines, #source_lines)
+    end
+
+    return source_lines
 end
 
 return M

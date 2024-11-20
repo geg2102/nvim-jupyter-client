@@ -1,6 +1,7 @@
 local M = {}
 local json = require("dkjson")
 local buffer_ops = require("nvim-jupyter-client.objects.notebook.buffer_operations")
+local utils = require("nvim-jupyter-client.utils.utils")
 
 function M.read(fname, template)
     local file_exists = vim.fn.filereadable(fname) == 1
@@ -44,6 +45,11 @@ function M.save(self)
         setmetatable(cell.outputs, { __jsontype = "array" })
         if cell.execution_count == nil then
             cell.execution_count = 0
+        end
+
+        -- Remove leading and trailing triple quotes from markdown cells
+        if cell.cell_type == "markdown" and type(cell.source) == "table" then
+            cell.source = utils.remove_triple_quotes(cell.source)
         end
     end
 

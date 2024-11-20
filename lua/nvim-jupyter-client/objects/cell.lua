@@ -13,8 +13,8 @@ function Cell:new(cell)
     local c = {}
     if cell then
         c = {
-            cell_type = cell["cell_type"],
-            id = cell["id"],
+            cell_type = cell.cell_type or cell["cell_type"],
+            id = cell.id or cell["id"],
             execution_count = cell["execution_count"] or nil,
             metadata = cell["metadata"],
             outputs = cell["outputs"],
@@ -38,11 +38,10 @@ end
 
 function Cell:reset_source(lines)
     local source = {}
-    for _,line in ipairs(lines) do
+    for _, line in ipairs(lines) do
         table.insert(source, line .. "\n")
     end
     self.source = source
 end
-
 
 return Cell
