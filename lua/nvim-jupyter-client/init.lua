@@ -73,7 +73,7 @@ local function setup_autocommands(buf)
                 local cursor_pos = api.nvim_win_get_cursor(win) -- Store cursor position
                 local success, err = pcall(function()
                     -- Update cells from current buffer content
-                    nb:_update_cells_from_buffer(buf)
+                    -- nb:_update_cells_from_buffer(buf)
                     -- Save the notebook state
                     nb:save()
                     -- Reset the modified flag
@@ -100,7 +100,7 @@ function M.setup(user_config)
         group = group,
         pattern = { "*.ipynb" },
         callback = function()
-            local notebook = M.init_notebook()
+            M.init_notebook()
             setup_autocommands(api.nvim_get_current_buf())
         end
     })
