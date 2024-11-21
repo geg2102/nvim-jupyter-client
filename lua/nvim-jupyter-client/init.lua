@@ -12,13 +12,8 @@ M.config = {
     cell_highlight_group = "CurSearch", -- Default highlight group for cell execution count
     highlights = {
         cell_title = {
-            ctermfg = 'red',
-            ctermbg = 'yellow',
-            cterm = { bold = true },
-            -- Add GUI colors for modern terminals
-            fg = '#ff0000',
-            bg = '#ffff00',
-            bold = true,
+            fg = 'white',
+            bg = 'black',
         }
     }
 }
@@ -105,7 +100,17 @@ end
 
 -- Setup function to be called when loading a notebook
 function M.setup(user_config)
+    if not M.decor_ns then
+        M.decor_ns = api.nvim_create_namespace('rendered_jupyter')
+    end
+
     M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
+
+    local highlight_group = M.config.cell_highlight_group or "CurSearch"
+    if highlight_group ~= "CurSearch" then
+        api.nvim_set_hl(0, highlight_group, M.config.highlights.cell_title)
+    end
+
     -- Create autocommand to initialize notebooks when opening appropriate files
     local group = api.nvim_create_augroup('jupyterinit', { clear = true })
     api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
@@ -117,9 +122,5 @@ function M.setup(user_config)
         end
     })
 end
-
-M.decor_ns = api.nvim_create_namespace('rendered_jupyter')
-api.nvim_set_hl(M.decor_ns, 'jupyterhl', M.config.highlights.cell_title)
-
 
 return M

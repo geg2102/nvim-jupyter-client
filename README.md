@@ -70,9 +70,8 @@ require('nvim-jupyter-client').setup({
     -- If custom highlight group then set these manually
     highlights = {
         cell_title = {
-            ctermfg = "#ffffff",
-            ctermbg = "#000000",
-            bold = true
+            fg = "#ffffff",
+            bg = "#000000",
         }
     }
 })

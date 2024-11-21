@@ -153,9 +153,19 @@ end
 
 function M.reset_extmarks(bufnr)
     local jupyter_client = require("nvim-jupyter-client")
-    local decor_ns = jupyter_client.decor_ns
-    local config = jupyter_client.config or {}
-    local highlight_group = config.cell_highlight_group or "CurSearch"
+
+    local decor_ns = api.nvim_create_namespace('rendered_jupyter')
+    local highlight_group = jupyter_client.config.cell_highlight_group or "CurSearch"
+
+    if not pcall(vim.api.nvim_get_hl_by_name, highlight_group, true) then
+        vim.notify(string.format("Highlight group '%s' not found, falling back to CurSearch", highlight_group),
+            vim.log.levels.WARN)
+        highlight_group = "CurSearch"
+    end
+
+    if highlight_group ~= "CurSearch" then
+        api.nvim_set_hl(0, highlight_group, jupyter_client.config.highlights.cell_title)
+    end
 
     local buf = bufnr or 0
     api.nvim_buf_clear_namespace(buf, decor_ns, 0, -1)
