@@ -85,14 +85,14 @@ function M.update_cells_from_buffer(notebook, bufnr)
 
         if string.match(trimmed_line, "^#%s*%%%%") then
             local cell_id = string.match(trimmed_line, ID_PATTERN)
-            if not cell_id then
+            if not cell_id or cell_id == "" then
                 cell_id = utils.uuid()
                 local new_header = string.format(CELL_HEADER, cell_id, " ")
                 api.nvim_buf_set_lines(bufnr, i - 1, i, false, { new_header })
                 -- Update lines and line variables after modifying the buffer
                 lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
                 num_lines = #lines
-                line = new_header
+                line = lines[i]
                 trimmed_line = line:gsub("^%s*(.-)%s*$", "%1")
             end
 
@@ -133,7 +133,7 @@ function M.update_cells_from_buffer(notebook, bufnr)
             if existing_cell then
                 existing_cell.source = cell_lines
                 existing_cell.cell_type = cell_type_in_header -- Update cell_type here
-                setmetatable(existing_cell, Cell)
+                setmetatable(existing_cell, { __index = Cell })
                 table.insert(temp_cells, existing_cell)
             else
                 local newCell = Cell:new()

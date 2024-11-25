@@ -30,7 +30,7 @@ function M.read(fname, template)
         end
     end
 
-    notebook.metadata.nb_format_minor = 5
+    notebook.nbformat_minor = 5
 
     return notebook
 end

@@ -1,6 +1,7 @@
 local random = math.random
 local M = {}
 
+math.randomseed(os.time())
 -- A method to combine two tables into a a new table of key, value pair
 -- @param a table. This is the keys in the resulting table.
 -- @param b table. This is the values in the resulting table.
@@ -23,7 +24,6 @@ function M.pair_with_next(t)
 end
 
 function M.uuid()
-    math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 9)))
     local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     return string.gsub(template, '[xy]', function(c)
         local v = (c == "x") and random(0, 0xf) or random(8, 0xb)
