@@ -22,8 +22,17 @@ function M.read(fname, template)
         vim.notify("File is empty, loading template", vim.log.levels.DEBUG)
         return template or require("nvim-jupyter-client.template")
     end
+    local notebook = json.decode(content)
 
-    return json.decode(content)
+    for _, cell in ipairs(notebook.cells) do
+        if not cell.id then
+            cell.id = utils.uuid()
+        end
+    end
+
+    notebook.metadata.nb_format_minor = 5
+
+    return notebook
 end
 
 function M.save(self)
@@ -34,7 +43,8 @@ function M.save(self)
 
     buffer_ops.update_cells_from_buffer(self, 0)
     local output_data = {
-        cells = self.cells,
+        -- Make a deep copy of the cells
+        cells = vim.deepcopy(self.cells),
         metadata = self.metadata,
         nbformat = self.nbformat,
         nbformat_minor = self.nbformat_minor
