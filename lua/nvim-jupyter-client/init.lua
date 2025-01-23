@@ -113,7 +113,7 @@ function M.setup(user_config)
 
     -- Create autocommand to initialize notebooks when opening appropriate files
     local group = api.nvim_create_augroup('jupyterinit', { clear = true })
-    api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+    api.nvim_create_autocmd({ "BufEnter", "BufReadPost", "BufNewFile" }, {
         group = group,
         pattern = { "*.ipynb" },
         callback = function()
