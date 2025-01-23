@@ -38,7 +38,6 @@ function M.remove_cell(notebook, cell_id)
     for index, cell in ipairs(notebook.cells) do
         if cell.id == cell_id then
             table.remove(notebook.cells, index)
-            break
         end
     end
     notebook:render_py(0)

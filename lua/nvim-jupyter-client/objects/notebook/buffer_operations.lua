@@ -2,7 +2,6 @@ local api = vim.api
 local utils = require("nvim-jupyter-client.utils.utils")
 local Cell = require("nvim-jupyter-client.objects.cell")
 local navigation = require("nvim-jupyter-client.objects.notebook.navigation")
-
 local M = {}
 
 local CELL_HEADER = "# %%%% %s [%s]\n"
@@ -147,6 +146,7 @@ function M.update_cells_from_buffer(notebook, bufnr)
         end
     end
     notebook.cells = temp_cells
+    vim.b.notebook = notebook
     M.reset_extmarks(0)
     return temp_cells
 end
