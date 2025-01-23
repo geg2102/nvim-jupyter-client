@@ -90,7 +90,13 @@ vim.keymap.set("n", "<leader>jA", "<cmd>JupyterAddCellAbove<CR>", { desc = "Add 
 vim.keymap.set("n", "<leader>jd", "<cmd>JupyterRemoveCell<CR>", { desc = "Remove current Jupyter cell" })
 vim.keymap.set("n", "<leader>jm", "<cmd>JupyterMergeCellAbove<CR>", { desc = "Merge with cell above" })
 vim.keymap.set("n", "<leader>jM", "<cmd>JupyterMergeCellBelow<CR>", { desc = "Merge with cell below" })
-vim.keymap.set("n", "<leader>jt", "<cmd>JupyterConvertCellType<CR>", { desc = "Convert cell type (code/markdown)" })
+vim.keymap.set("n", "<leader>jt", "<cmd>JupyterConvertCellType<CR>", 
+    { desc = "Convert cell type (code/markdown)" })
+vim.keymap.set("v", "<leader>jm", "<cmd>JupyterMergeVisual<CR>", 
+    { desc = "Merge selected cells" }),
+vim.keymap.set("n", "<leader>jD", "<cmd>JupyterDeleteCell<CR>",
+    { desc = "Delete cell under cursor and store in register" }),
+
 ```
 
 
@@ -100,6 +106,8 @@ vim.keymap.set("n", "<leader>jt", "<cmd>JupyterConvertCellType<CR>", { desc = "C
 - `:JupyterMergeCellAbove` - Merge current cell with the cell above
 - `:JupyterMergeCellBelow` - Merge current cell with the cell below
 - `:JupyterConvertCellType` - Toggle between code and markdown cell types
+- `:JupyterMergeVisual` - Merge selected cells
+- `:JupyterDeleteCell` - Delete current cell and store in register
 
 ## Usage
 

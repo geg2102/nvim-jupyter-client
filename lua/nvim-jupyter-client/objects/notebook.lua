@@ -143,4 +143,12 @@ function Notebook:merge_above()
     buffer_ops.reset_cursor(self, "above")
 end
 
+function Notebook:merge_visual_selection()
+    cell_ops.merge_visual_selection(self)
+end
+
+function Notebook:remove_cell_with_register(cell_id)
+    cell_ops.remove_cell_with_register(self, cell_id)
+end
+
 return Notebook

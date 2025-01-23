@@ -64,6 +64,71 @@ function M.merge_cells(notebook, cells)
     notebook:render_py(0)
 end
 
+function M.merge_visual_selection(notebook)
+    local start_line = vim.fn.line("'<")
+    local end_line = vim.fn.line("'>")
+
+    -- Get all cells that intersect with the visual selection
+    local cells_to_merge = {}
+    local current_line = 1
+
+    for _, cell in ipairs(notebook.cells) do
+        local cell_start = current_line
+        local cell_end = current_line + #cell.source - 1
+
+        if not (cell_end < start_line or cell_start > end_line) then
+            table.insert(cells_to_merge, cell)
+        end
+
+        current_line = cell_end + 2 -- +2 for the cell separator
+    end
+
+    if #cells_to_merge >= 2 then
+        M.merge_cells(notebook, cells_to_merge)
+    else
+        vim.notify("Select at least 2 cells to merge", vim.log.levels.WARN)
+    end
+end
+
+function M.remove_cell_with_register(notebook, cell_id, operator_opts)
+    cell_id = cell_id or navigation.get_under_cursor_cell_id(0)
+
+    for index, cell in ipairs(notebook.cells) do
+        if cell.id == cell_id then
+            -- Convert cell content to string
+            local cell_content = table.concat(cell.source, "") .. "\n"
+
+            -- Store cell type and content in register
+            local cell_data = string.format("\n# %%%% %s []\n%s\n", cell_id, cell_content)
+
+            -- Handle register selection like native Vim
+            if operator_opts and operator_opts.register then
+                -- If a specific register was given (like "ay to delete into register a)
+                vim.fn.setreg(operator_opts.register, cell_data)
+            else
+                -- Default behavior: store in unnamed register and small delete register
+                vim.fn.setreg('"', cell_data)
+                -- If the cell is less than one line, store in small delete register
+                if #cell.source <= 1 then
+                    vim.fn.setreg('-', cell_data)
+                else
+                    -- For multiline deletes, store in numbered registers
+                    -- Shift numbered registers
+                    for i = 9, 2, -1 do
+                        local content = vim.fn.getreg(tostring(i - 1))
+                        vim.fn.setreg(tostring(i), content)
+                    end
+                    vim.fn.setreg('1', cell_data)
+                end
+            end
+
+            table.remove(notebook.cells, index)
+            break
+        end
+    end
+    notebook:render_py(0)
+end
+
 function M.convert_type(notebook)
     buffer_ops.update_cells_from_buffer(notebook, 0)
     local cursor_id = navigation.get_under_cursor_cell_id(0)
