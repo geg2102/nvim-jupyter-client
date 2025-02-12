@@ -53,6 +53,14 @@ function M.save(self)
     for _, cell in ipairs(output_data.cells) do
         setmetatable(cell.metadata, { __jsontype = "object" })
         setmetatable(cell.outputs, { __jsontype = "array" })
+
+        for _, output in ipairs(cell.outputs or {}) do
+            if output.metadata then
+                setmetatable(output.metadata, { __jsontype = "object" })
+            end
+        end
+
+
         if cell.execution_count == nil then
             cell.execution_count = 0
         end
